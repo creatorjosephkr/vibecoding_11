@@ -7,7 +7,7 @@ export const EXERCISE_DATABASE = {
   '버피': {
     title: '버피 테스트 (Burpee)',
     category: '전신 유산소 & 근지구력',
-    image: '/images/burpee.jpg',
+    image: './images/burpee.jpg',
     bgColor: '#091223',
     targetMuscles: ['대퇴사두근', '가슴/삼두', '코어 복근', '둔근'],
     steps: [
@@ -21,7 +21,7 @@ export const EXERCISE_DATABASE = {
   '점핑': {
     title: '점핑 잭 (Jumping Jack)',
     category: '웜업 & 전신 유산소',
-    image: '/images/jumping_jack.jpg',
+    image: './images/jumping_jack.jpg',
     bgColor: '#051121',
     targetMuscles: ['종아리', '전신 심폐', '어깨 삼각근', '내전근'],
     steps: [
@@ -35,7 +35,7 @@ export const EXERCISE_DATABASE = {
   '플랭크': {
     title: '스탠다드 플랭크 (Standard Plank)',
     category: '코어 강화 & 등척성 운동',
-    image: '/images/plank.jpg',
+    image: './images/plank.jpg',
     bgColor: '#0b0f18',
     targetMuscles: ['복직근', '복횡근', '척추기립근', '둔근'],
     steps: [
@@ -49,7 +49,7 @@ export const EXERCISE_DATABASE = {
   '마운틴': {
     title: '마운틴 클라이머 (Mountain Climber)',
     category: '고강도 코어 & 심폐 유산소',
-    image: '/images/mountain_climber.jpg',
+    image: './images/mountain_climber.jpg',
     bgColor: '#070f1a',
     targetMuscles: ['장요근/복근', '어깨 삼각근', '햄스트링', '심폐지구력'],
     steps: [
@@ -63,7 +63,7 @@ export const EXERCISE_DATABASE = {
   '스쿼트': {
     title: '에어 스쿼트 (Air Squat)',
     category: '하체 근력 & 둔근 강화',
-    image: '/images/squat.jpg',
+    image: './images/squat.jpg',
     bgColor: '#050e1f',
     targetMuscles: ['대퇴사두근', '대둔근', '햄스트링', '척추기립근'],
     steps: [
@@ -77,7 +77,7 @@ export const EXERCISE_DATABASE = {
   '푸시업': {
     title: '스탠다드 푸시업 (Standard Push-up)',
     category: '상체 프레스 & 흉근 강화',
-    image: '/images/burpee.jpg',
+    image: './images/burpee.jpg',
     bgColor: '#091223',
     targetMuscles: ['대흉근', '삼두근', '전면 삼각근', '코어'],
     steps: [
@@ -91,7 +91,7 @@ export const EXERCISE_DATABASE = {
   '런지': {
     title: '워킹/포워드 런지 (Lunge)',
     category: '단측 하체 & 밸런스 트레이닝',
-    image: '/images/squat.jpg',
+    image: './images/squat.jpg',
     bgColor: '#050e1f',
     targetMuscles: ['둔근', '대퇴사두근', '내전근', '코어 밸런스'],
     steps: [
@@ -105,7 +105,7 @@ export const EXERCISE_DATABASE = {
   '복싱': {
     title: '복싱 섀도우 & 콤비네이션',
     category: '민첩성 & 전신 풋워크 인터벌',
-    image: '/images/boxing.jpg',
+    image: './images/boxing.jpg',
     bgColor: '#030d19',
     targetMuscles: ['어깨/등', '회전 코어', '종아리/풋워크', '심폐 지구력'],
     steps: [
@@ -119,7 +119,7 @@ export const EXERCISE_DATABASE = {
   '크런치': {
     title: '복부 크런치 (Ab Crunch)',
     category: '상복부 타깃 고립 운동',
-    image: '/images/plank.jpg',
+    image: './images/plank.jpg',
     bgColor: '#0b0f18',
     targetMuscles: ['상복직근', '외복사근'],
     steps: [
@@ -133,7 +133,7 @@ export const EXERCISE_DATABASE = {
   '스트레칭': {
     title: '전신 이완 & 모빌리티 스트레칭',
     category: '유연성 회복 & 관절 가동성',
-    image: '/images/stretch.jpg',
+    image: './images/stretch.jpg',
     bgColor: '#1e2430',
     targetMuscles: ['척추기립근', '햄스트링', '광배근', '고관절 굴곡근'],
     steps: [
@@ -154,7 +154,7 @@ export function getExerciseGuide(name, customDescription = '') {
     return {
       title: name,
       category: '맞춤 설정 가이드',
-      image: '/images/jumping_jack.jpg',
+      image: './images/jumping_jack.jpg',
       bgColor: '#051121',
       targetMuscles: ['사용자 지정 부위'],
       steps: customDescription.split('\n').filter(s => s.trim().length > 0),
@@ -173,7 +173,7 @@ export function getExerciseGuide(name, customDescription = '') {
   return {
     title: name || '인터벌 트레이닝',
     category: '전신 활력 운동',
-    image: '/images/jumping_jack.jpg',
+    image: './images/jumping_jack.jpg',
     bgColor: '#051121',
     targetMuscles: ['전신 근육', '코어 밸런스', '심폐 지구력'],
     steps: [

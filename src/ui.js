@@ -268,7 +268,7 @@ export class UIRenderer {
       this.guideIllustrationWrap.style.backgroundColor = imgBgColor;
     }
     if (this.guideIllustrationImg) {
-      this.guideIllustrationImg.src = guide.image || '/images/jumping_jack.jpg';
+      this.guideIllustrationImg.src = guide.image || './images/jumping_jack.jpg';
       this.guideIllustrationImg.alt = `${guide.title} 동작 자세 가이드 일러스트`;
       this.guideIllustrationImg.style.backgroundColor = imgBgColor;
     }
@@ -422,7 +422,7 @@ export class UIRenderer {
       item.innerHTML = `
         <span class="stage-badge-type ${typeBadgeClass}">${typeLabel}</span>
         <div class="stage-thumb-box" title="${guide.title} 동작 일러스트" style="background-color: ${thumbBg};">
-          <img class="stage-thumb-img" src="${guide.image || '/images/jumping_jack.jpg'}" alt="${st.name}" loading="lazy" style="background-color: ${thumbBg};">
+          <img class="stage-thumb-img" src="${guide.image || './images/jumping_jack.jpg'}" alt="${st.name}" loading="lazy" style="background-color: ${thumbBg};">
         </div>
         
         <div class="stage-inputs-group">
@@ -444,7 +444,15 @@ export class UIRenderer {
         st.name = nameInput.value.trim() || `운동 ${idx + 1}`;
         const updatedGuide = getExerciseGuide(st.name, st.customDescription);
         const thumbImg = item.querySelector('.stage-thumb-img');
-        if (thumbImg) thumbImg.src = updatedGuide.image || '/images/jumping_jack.jpg';
+        const thumbBox = item.querySelector('.stage-thumb-box');
+        const newBg = updatedGuide.bgColor || '#06080d';
+        if (thumbImg) {
+          thumbImg.src = updatedGuide.image || './images/jumping_jack.jpg';
+          thumbImg.style.backgroundColor = newBg;
+        }
+        if (thumbBox) {
+          thumbBox.style.backgroundColor = newBg;
+        }
         if (this.onStageChange) this.onStageChange(stages);
       });
 
