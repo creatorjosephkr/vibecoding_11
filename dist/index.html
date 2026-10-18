@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>PulseRoutine Pro - 맞춤형 시퀀스 운동 타이머 & 타바타 인터벌</title>
+  <meta name="description" content="카운트다운, 타바타, 랩타임 3가지 스테이지를 자유롭게 구성하는 고몰입형 인터벌 운동 타이머. 바닥 거치 최적화 대형 디스플레이와 Web Audio API 비프음을 지원합니다.">
+  <meta name="theme-color" content="#080a0f">
+
+  <!-- Google Fonts: Outfit (UI), Chakra Petch (Digits/Athletic), Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script type="module" crossorigin src="/assets/index-CRXtvn8T.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DJYJayuk.css">
+</head>
+<body data-phase="idle">
+  <!-- Dynamic Ambient Lighting Background -->
+  <div class="ambient-bg" id="ambientBg" aria-hidden="true"></div>
+  <div class="ambient-noise" aria-hidden="true"></div>
+
+  <div class="app-container">
+    <!-- Top Header Bar -->
+    <header class="app-header" id="appHeader">
+      <div class="brand-wrapper">
+        <div class="brand-icon" aria-hidden="true">⚡</div>
+        <h1 class="brand-title">Pulse<span>Routine</span></h1>
+      </div>
+
+      <div class="header-actions">
+        <!-- Screen Wake Lock Badge -->
+        <span class="badge" id="wakeLockBadge" title="화면 꺼짐 방지 상태">
+          <span class="badge-dot"></span>
+          <span id="wakeLockText">화면유지 ON</span>
+        </span>
+
+        <!-- Prep Time Selector (대기시간 설정) -->
+        <div class="prep-control-badge" title="운동 시작 전 준비/대기 카운트다운 시간">
+          <span>⏱</span>
+          <label for="prepTimeSelect" style="cursor: pointer;">대기:</label>
+          <select id="prepTimeSelect" class="prep-select" aria-label="시작 전 대기시간 선택">
+            <option value="0">0초 (없음)</option>
+            <option value="3">3초</option>
+            <option value="5" selected>5초</option>
+            <option value="10">10초</option>
+            <option value="15">15초</option>
+          </select>
+        </div>
+
+        <!-- Light/Dark Mode Toggle -->
+        <button type="button" class="icon-btn" id="themeToggleBtn" aria-label="테마 변경 (다크/라이트)" title="다크/라이트 모드 전환 (단축키: T)">
+          <span id="themeIcon">☀️</span>
+          <span id="themeText">라이트</span>
+        </button>
+
+        <!-- Audio Mute Toggle -->
+        <button type="button" class="icon-btn" id="soundToggleBtn" aria-label="사운드 켜기/끄기" title="오디오 비프음 토글">
+          <span id="soundIcon">🔊</span>
+          <span id="soundText">사운드</span>
+        </button>
+
+        <!-- Focus Mode Toggle (Floor View) -->
+        <button type="button" class="icon-btn" id="focusModeBtn" aria-label="바닥 거치 집중 모드 토글" title="바닥 거치 집중 모드">
+          <span id="focusIcon">⛶</span>
+          <span id="focusText">집중 뷰</span>
+        </button>
+
+        <!-- Routine Library Button -->
+        <button type="button" class="icon-btn" id="routineLibraryBtn" aria-label="루틴 보관함 열기" title="저장된 루틴 목록">
+          <span>📂</span>
+          <span>보관함</span>
+        </button>
+
+        <!-- Quick Save Routine Button -->
+        <button type="button" class="icon-btn" id="quickSaveBtn" aria-label="현재 루틴 저장" title="현재 루틴 저장">
+          <span>💾</span>
+          <span>저장</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="mainDashboard">
+      <!-- ============================================================
+           Hero Display Section (Floor-View Dominant Screen: Left Timer, Right Guide)
+           ============================================================ -->
+      <section class="hero-card" id="heroDisplay" aria-label="메인 운동 디스플레이">
+        <!-- 2-Column Responsive Layout: Left = Timer, Right = Exercise Guide -->
+        <div class="hero-layout-grid">
+          <!-- Left Column: Timer & Controls -->
+          <div class="hero-timer-pane">
+            <!-- Next Stage Preview Bar -->
+            <div class="next-preview-bar" id="nextPreviewBar">
+              <span class="next-label">NEXT</span>
+              <div class="next-details">
+                <span class="next-title" id="nextStageName">다음 운동 대기 중</span>
+                <span id="nextStageSub">준비 중</span>
+              </div>
+            </div>
+
+            <!-- Hero Metadata Row -->
+            <div class="hero-meta-row">
+              <div class="phase-pill" id="phasePill">⚪ READY</div>
+              <div class="stage-pill" id="stagePill">STAGE 1 / 1</div>
+              <div class="round-pill" id="roundPill">ROUND 1 / 1</div>
+            </div>
+
+            <!-- Current Stage Name Display -->
+            <h2 class="current-stage-title" id="currentStageTitle">루틴을 시작해 보세요</h2>
+
+            <!-- Circular Progress Dial with Giant Tabular Digits -->
+            <div class="timer-dial-container" id="timerDialContainer">
+              <svg class="dial-svg" viewBox="0 0 240 240" aria-hidden="true">
+                <circle class="dial-track" cx="120" cy="120" r="102" />
+                <circle class="dial-progress" id="dialProgressRing" cx="120" cy="120" r="102" stroke-dasharray="640.88" stroke-dashoffset="0" />
+              </svg>
+
+              <div class="timer-inner-content">
+                <div class="timer-digits" id="timerDigits">00:00</div>
+                <div class="timer-sublabel" id="timerSublabel">남은 시간</div>
+              </div>
+            </div>
+
+            <!-- Overall Routine Mini Progress Bar -->
+            <div class="overall-progress-bar-wrap" title="전체 루틴 진행도">
+              <div class="overall-progress-bar" id="overallProgressBar"></div>
+            </div>
+
+            <!-- Big Hero Controls -->
+            <div class="hero-controls" id="heroControls">
+              <button type="button" class="btn-ctrl btn-icon-only" id="btnPrevStage" title="이전 단계 (⏮)" aria-label="이전 단계">
+                ⏮
+              </button>
+
+              <button type="button" class="btn-ctrl btn-ctrl-primary" id="btnPlayPause" aria-label="루틴 시작/일시정지">
+                <span id="playPauseIcon">▶</span>
+                <span id="playPauseText">시작하기</span>
+              </button>
+
+              <button type="button" class="btn-ctrl btn-ctrl-secondary" id="btnReset" aria-label="루틴 초기화">
+                ↺ 초기화
+              </button>
+
+              <button type="button" class="btn-ctrl btn-icon-only" id="btnSkipStage" title="다음 단계 건너뛰기 (⏭)" aria-label="다음 단계 건너뛰기">
+                ⏭
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column: Exercise Guide & Form How-To -->
+          <div class="hero-guide-pane" id="heroGuidePane" aria-label="운동 설명 및 방법">
+            <div class="guide-panel-card">
+              <div class="guide-card-header">
+                <div class="guide-header-badge-row">
+                  <span class="guide-badge-category" id="guideCategory">운동 가이드</span>
+                  <span class="guide-status-tag" id="guidePhaseTag">WORK PHASE</span>
+                </div>
+                <h3 class="guide-exercise-title" id="guideTitle">운동 자세 가이드</h3>
+              </div>
+
+              <!-- Exercise Illustration Graphic Box -->
+              <div class="guide-illustration-container" id="guideIllustrationWrap">
+                <img id="guideIllustrationImg" class="guide-illustration-img" src="/images/burpee.jpg" alt="운동 동작 자세 일러스트" loading="lazy">
+                <div class="illustration-overlay-badge">
+                  <span>MOTION FORM GUIDE</span>
+                </div>
+              </div>
+
+              <!-- Target Muscle Tags -->
+              <div class="guide-muscles-row" id="guideMuscleTags">
+                <span class="muscle-tag">전신 유산소</span>
+                <span class="muscle-tag">코어</span>
+              </div>
+
+              <!-- Dynamic Phase Notice (shows special rest or prep message) -->
+              <div class="guide-phase-notice" id="guidePhaseNotice" style="display: none;">
+                <span id="guidePhaseNoticeIcon">💤</span>
+                <span id="guidePhaseNoticeText">휴식 중: 호흡을 가다듬고 다음 세트를 준비하세요.</span>
+              </div>
+
+              <!-- How-To Step List -->
+              <div class="guide-steps-section">
+                <div class="guide-section-label">올바른 운동 방법 (Execution Steps)</div>
+                <ol class="guide-steps-list" id="guideStepsList">
+                  <li>바른 자세로 서서 척추를 정렬하고 코어에 힘을 줍니다.</li>
+                  <li>일정한 템포를 유지하며 정확한 가동 범위로 동작을 수행합니다.</li>
+                  <li>호흡을 멈추지 말고 내쉬고 들이마시기를 반복합니다.</li>
+                </ol>
+              </div>
+
+              <!-- Pro Trainer Tip Box -->
+              <div class="guide-tip-box" id="guideTipBox">
+                <div class="guide-tip-header">
+                  <span>💡</span>
+                  <strong>트레이너 폼 코칭 팁</strong>
+                </div>
+                <p class="guide-tip-content" id="guideProTip">
+                  빠른 속도보다는 정확한 자세가 운동 효과와 부상 방지에 훨씬 중요합니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           Stage Builder Section
+           ============================================================ -->
+      <section class="builder-card" id="builderSection" aria-label="운동 스테이지 구성기">
+        <div class="builder-header">
+          <div class="section-title-wrap">
+            <h2>운동 시퀀스 구성</h2>
+            <p class="section-subtitle" id="totalRoutineMeta">총 3개 단계 · 약 4분 30초 소요 예정</p>
+          </div>
+
+          <!-- Add Stage Type Buttons -->
+          <div class="add-stage-selector">
+            <button type="button" class="btn-add-type" id="btnAddCountdown" title="초 단위 카운트다운 단계 추가">
+              <span>⏱</span> + 시간 제한
+            </button>
+            <button type="button" class="btn-add-type" id="btnAddTabata" title="운동/휴식 세트 타바타 단계 추가">
+              <span>🔥</span> + 타바타
+            </button>
+            <button type="button" class="btn-add-type" id="btnAddCountup" title="0초부터 증가하는 랩타임 단계 추가">
+              <span>📈</span> + 랩 타임
+            </button>
+          </div>
+        </div>
+
+        <!-- Preset Quick Recommendations -->
+        <div class="preset-pills-row" id="presetPillsRow" aria-label="추천 프리셋 루틴">
+          <span style="font-size: 0.78rem; color: #64748B; font-weight: 600; white-space: nowrap;">추천 프리셋:</span>
+          <button type="button" class="preset-chip" data-preset-id="preset-hybrid-burn">⚡ 전신 버닝 하이브리드</button>
+          <button type="button" class="preset-chip" data-preset-id="preset-classic-tabata">🔥 정통 타바타 코어</button>
+          <button type="button" class="preset-chip" data-preset-id="preset-boxing-shadow">🥊 3분 복싱 섀도우</button>
+          <button type="button" class="preset-chip" data-preset-id="preset-mobility-stretch">🧘 모빌리티 스트레칭</button>
+        </div>
+
+        <!-- Dynamic Stages Cards Container -->
+        <div class="stages-list" id="stagesContainer" aria-live="polite">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Routine Library & Save Modal -->
+    <div class="modal-overlay" id="routineModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">루틴 보관함 (Routine Library)</h3>
+          <button type="button" class="btn-close-modal" id="btnCloseModal" aria-label="모달 닫기">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Save Current Routine Box -->
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <label for="inputRoutineTitle" style="font-size: 0.85rem; font-weight: 600; color: #cbd5e1;">현재 루틴 저장하기</label>
+            <div class="routine-save-box">
+              <input type="text" id="inputRoutineTitle" class="input-routine-name" placeholder="루틴 이름 입력 (예: 월요 하체 HIIT)" maxlength="40">
+              <button type="button" class="btn-ctrl btn-ctrl-primary" id="btnConfirmSaveRoutine" style="height: auto; padding: 0.65rem 1.25rem; font-size: 0.9rem;">
+                저장
+              </button>
+            </div>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 0.5rem 0;">
+
+          <!-- Saved Routines List -->
+          <div>
+            <h4 style="font-size: 0.85rem; font-weight: 600; color: #cbd5e1; margin-bottom: 0.65rem;">저장된 맞춤 루틴 목록</h4>
+            <div class="saved-routines-list" id="savedRoutinesList">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Celebration Modal (When Whole Routine Completes) -->
+    <div class="modal-overlay" id="celebrateModal" role="dialog" aria-modal="true">
+      <div class="modal-content" style="max-width: 440px;">
+        <div class="celebrate-card">
+          <div class="celebrate-icon">🏆</div>
+          <h3 style="font-size: 1.7rem; font-weight: 800; color: #ffffff;">루틴 완주 성공!</h3>
+          <p style="color: #94a3b8; font-size: 0.95rem;">오늘의 계획된 모든 운동 단계를 훌륭하게 완수하셨습니다.</p>
+
+          <div class="celebrate-stats-grid">
+            <div class="stat-box">
+              <div class="stat-number" id="statTotalTime">00:00</div>
+              <div class="stat-title">총 운동 소요 시간</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number" id="statTotalStages">0</div>
+              <div class="stat-title">완료한 스테이지</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; width: 100%; margin-top: 0.5rem;">
+            <button type="button" class="btn-ctrl btn-ctrl-primary" id="btnRestartRoutine" style="flex: 1; height: 50px;">
+              다시 하기
+            </button>
+            <button type="button" class="btn-ctrl btn-ctrl-secondary" id="btnCloseCelebration" style="flex: 1; height: 50px;">
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
