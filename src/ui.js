@@ -2,7 +2,7 @@
  * UI Renderer and DOM Bindings
  * Handles real-time hero display updates, dynamic stage list rendering, and modals.
  */
-import { getExerciseGuide } from './exerciseDb.js';
+import { getExerciseGuide, resolveImagePath } from './exerciseDb.js';
 
 export class UIRenderer {
   constructor() {
@@ -267,10 +267,16 @@ export class UIRenderer {
     if (this.guideIllustrationWrap) {
       this.guideIllustrationWrap.style.backgroundColor = imgBgColor;
     }
+    const fallbackSrc = resolveImagePath('jumping_jack.jpg');
     if (this.guideIllustrationImg) {
-      this.guideIllustrationImg.src = guide.image || './images/jumping_jack.jpg';
+      this.guideIllustrationImg.src = guide.image || fallbackSrc;
       this.guideIllustrationImg.alt = `${guide.title} 동작 자세 가이드 일러스트`;
       this.guideIllustrationImg.style.backgroundColor = imgBgColor;
+      this.guideIllustrationImg.onerror = () => {
+        if (this.guideIllustrationImg.src !== fallbackSrc) {
+          this.guideIllustrationImg.src = fallbackSrc;
+        }
+      };
     }
 
     // Target muscle badges
@@ -419,10 +425,11 @@ export class UIRenderer {
       const guide = getExerciseGuide(st.name, st.customDescription);
       const thumbBg = guide.bgColor || '#06080d';
 
+      const fallbackThumb = resolveImagePath('jumping_jack.jpg');
       item.innerHTML = `
         <span class="stage-badge-type ${typeBadgeClass}">${typeLabel}</span>
         <div class="stage-thumb-box" title="${guide.title} 동작 일러스트" style="background-color: ${thumbBg};">
-          <img class="stage-thumb-img" src="${guide.image || './images/jumping_jack.jpg'}" alt="${st.name}" loading="lazy" style="background-color: ${thumbBg};">
+          <img class="stage-thumb-img" src="${guide.image || fallbackThumb}" alt="${st.name}" loading="lazy" style="background-color: ${thumbBg};">
         </div>
         
         <div class="stage-inputs-group">
@@ -447,7 +454,7 @@ export class UIRenderer {
         const thumbBox = item.querySelector('.stage-thumb-box');
         const newBg = updatedGuide.bgColor || '#06080d';
         if (thumbImg) {
-          thumbImg.src = updatedGuide.image || './images/jumping_jack.jpg';
+          thumbImg.src = updatedGuide.image || resolveImagePath('jumping_jack.jpg');
           thumbImg.style.backgroundColor = newBg;
         }
         if (thumbBox) {

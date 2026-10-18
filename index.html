@@ -13,6 +13,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./style.css">
+  <script>
+    // GitHub Pages subpath trailing slash normalization
+    (function() {
+      var p = window.location.pathname;
+      if (!p.endsWith('/') && !/\.[a-zA-Z0-9]+$/.test(p)) {
+        window.location.replace(p + '/' + window.location.search + window.location.hash);
+      }
+    })();
+  </script>
 </head>
 <body data-phase="idle">
   <!-- Dynamic Ambient Lighting Background -->
@@ -159,7 +168,7 @@
 
               <!-- Exercise Illustration Graphic Box -->
               <div class="guide-illustration-container" id="guideIllustrationWrap">
-                <img id="guideIllustrationImg" class="guide-illustration-img" src="./images/burpee.jpg" alt="운동 동작 자세 일러스트" loading="lazy">
+                <img id="guideIllustrationImg" class="guide-illustration-img" src="./images/burpee.jpg?v=2" alt="운동 동작 자세 일러스트" loading="lazy">
                 <div class="illustration-overlay-badge">
                   <span>MOTION FORM GUIDE</span>
                 </div>

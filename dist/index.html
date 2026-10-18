@@ -12,7 +12,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <script type="module" crossorigin src="./assets/index-DhNnNTPo.js"></script>
+  <script>
+    // GitHub Pages subpath trailing slash normalization
+    (function() {
+      var p = window.location.pathname;
+      if (!p.endsWith('/') && !/\.[a-zA-Z0-9]+$/.test(p)) {
+        window.location.replace(p + '/' + window.location.search + window.location.hash);
+      }
+    })();
+  </script>
+  <script type="module" crossorigin src="./assets/index-CLcIPdUA.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-DJYJayuk.css">
 </head>
 <body data-phase="idle">
@@ -160,7 +169,7 @@
 
               <!-- Exercise Illustration Graphic Box -->
               <div class="guide-illustration-container" id="guideIllustrationWrap">
-                <img id="guideIllustrationImg" class="guide-illustration-img" src="./assets/burpee-BFfo2Xt0.jpg" alt="운동 동작 자세 일러스트" loading="lazy">
+                <img id="guideIllustrationImg" class="guide-illustration-img" src="./assets/burpee-BFfo2Xt0.jpg?v=2" alt="운동 동작 자세 일러스트" loading="lazy">
                 <div class="illustration-overlay-badge">
                   <span>MOTION FORM GUIDE</span>
                 </div>
